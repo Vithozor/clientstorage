@@ -1,5 +1,5 @@
-(function(window, undefined){
-    var clientStorage = (function() {
+(function (window, document, undefined) {
+    var clientStorage = (function () {
         var getPathForCookie = function (path) {
             var pathParts;
             path = path || window.location.pathname;
@@ -11,14 +11,14 @@
             }
             return path;
         };
-        return { 
+        return {
             inCookie: false,
             get: function (key) {
                 var stored, expirity, i, cookieValue, cookieName,
-                cookies = document.cookie.split(";"),
-                cookiesLength = cookies.length;
+                    cookies = document.cookie.split(";"),
+                    cookiesLength = cookies.length;
                 if (!key || typeof key !== "string") {
-                    return undefined
+                    return undefined;
                 }
                 if (!this.inCookie && window.localStorage) {
                     stored = JSON.parse(window.localStorage.getItem(key));
@@ -81,7 +81,7 @@
                 return true;
             }
         };
-    })();
+    }());
     
     window.clientStorage = clientStorage;
-})(window);
+}(window, document));
