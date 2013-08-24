@@ -7,9 +7,7 @@ test( "saves data in localStorage", function() {
 
 test( "saves data in cookie if users needs", function() {
 	var expected = "somevalue";
-	clientStorage.inCookie = true;
-  	clientStorage.set("somekey","somevalue");
-	clientStorage.inCookie = false;
+	clientStorage.inCookie().set("somekey","somevalue");
 	ok(document.cookie.indexOf(expected) !== -1);
 });
 
@@ -21,9 +19,7 @@ test( "gets data from localStorage", function() {
 
 test( "gets data from cookie if users needs", function() {
 	var expected = "somevalue", actual;
-	clientStorage.inCookie = true;
-  	actual = clientStorage.get("somekey");
-	clientStorage.inCookie = false;
+	actual = clientStorage.inCookie().get("somekey");
 	deepEqual(actual, expected);
 });
 
