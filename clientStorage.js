@@ -12,7 +12,12 @@
             return path;
         };
         return {
-            inCookie: false,
+            saveCookie: false,
+            //if we need to save in cookie, use clientStorage.inCookie().get(...)
+            inCookie: function(){
+                this.saveCookie = true;
+                return this;
+            },
             get: function (key) {
                 var stored, expirity, i, cookieValue, cookieName,
                     cookies = document.cookie.split(";"),
@@ -20,7 +25,7 @@
                 if (!key || typeof key !== "string") {
                     return undefined;
                 }
-                if (!this.inCookie && window.localStorage) {
+                if (!this.saveCookie && window.localStorage) {
                     stored = JSON.parse(window.localStorage.getItem(key));
                     if (stored && stored.value) {
                         if (stored.expires) {
@@ -34,6 +39,7 @@
                     }
                 }
                 else {
+                    this.saveCookie = false;
                     for (i = 0; i < cookiesLength; i++) {
                         cookieValue = unescape(cookies[i].substr(cookies[i].indexOf("=") + 1));
                         if (cookieValue) {
@@ -58,7 +64,8 @@
                     expiration.setDate(expiration.getDate() + expires);
                     objToSave.expires = expiration;
                 }
-                if (this.inCookie || !window.localStorage) {
+                if (this.saveCookie || !window.localStorage) {
+                    this.saveCookie = false;
                     document.cookie = key + "=" + escape(JSON.stringify(value)) + ((expires) ? "; expires=" + expiration.toUTCString() : "") + "; path=" + path;
                 }
                 else {
@@ -72,10 +79,11 @@
                 if (!key || typeof key !== "string") {
                     return false;
                 }
-                if (!this.inCookie && window.localStorage) {
+                if (!this.saveCookie && window.localStorage) {
                     window.localStorage.removeItem(key);
                 }
                 else {
+                    this.saveCookie = false;
                     document.cookie = key + "=; expires=-1; path=" + path;
                 }
                 return true;
