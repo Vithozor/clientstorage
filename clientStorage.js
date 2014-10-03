@@ -33,7 +33,7 @@
                     return undefined;
                 }
                 if (!saveCookie && storage) {
-                    stored = JSON.parse(window.sessionStorage.getItem(key));
+                    stored = JSON.parse(window.localStorage.getItem(key));
                     if (stored && stored.value) {
                         if (stored.expires) {
                             expirity = new Date(stored.expires);
@@ -77,7 +77,7 @@
                 }
                 else {
                     objToSave.value = value;
-                    window.sessionStorage.setItem(key, JSON.stringify(objToSave));
+                    window.localStorage.setItem(key, JSON.stringify(objToSave));
                 }
                 return true;
             },
@@ -87,7 +87,7 @@
                     return false;
                 }
                 if (!saveCookie && storage) {
-                    window.sessionStorage.removeItem(key);
+                    window.localStorage.removeItem(key);
                 }
                 else {
                     saveCookie = false;
