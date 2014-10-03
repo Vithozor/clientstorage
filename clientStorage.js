@@ -1,21 +1,28 @@
 (function (window, document, undefined) {
-    var clientStorage = (function () {
+     var clientStorage = (function () {
         var getPathForCookie = function (path) {
             var pathParts;
             path = path || window.location.pathname;
             pathParts = path.split("/");
-            //mirem si estem en un document final (p.e: algo.htm) o en un path normal
             if (path.charAt(path.length - 1) !== "/" && pathParts[pathParts.length - 1].indexOf(".") !== -1) {
                 pathParts.splice(pathParts.length - 1, 1);
                 path = pathParts.join("/") + "/";
             }
             return path;
-        };
+        },
+        storage = (function () {
+            try {
+                return typeof Storage !== "undefined";
+            }
+            catch (error) {
+                return false;
+            }
+        }()),
+        saveCookie = false;
         return {
-            saveCookie: false,
-            //if we need to save in cookie, use clientStorage.inCookie().get(...)
-            inCookie: function(){
-                this.saveCookie = true;
+            //if we need to save in cookie, use clientStorage.inCookie().set(...)
+            inCookie: function () {
+                saveCookie = true;
                 return this;
             },
             get: function (key) {
@@ -25,8 +32,8 @@
                 if (!key || typeof key !== "string") {
                     return undefined;
                 }
-                if (!this.saveCookie && window.localStorage) {
-                    stored = JSON.parse(window.localStorage.getItem(key));
+                if (!saveCookie && storage) {
+                    stored = JSON.parse(window.sessionStorage.getItem(key));
                     if (stored && stored.value) {
                         if (stored.expires) {
                             expirity = new Date(stored.expires);
@@ -39,7 +46,7 @@
                     }
                 }
                 else {
-                    this.saveCookie = false;
+                    saveCookie = false;
                     for (i = 0; i < cookiesLength; i++) {
                         cookieValue = unescape(cookies[i].substr(cookies[i].indexOf("=") + 1));
                         if (cookieValue) {
@@ -64,13 +71,13 @@
                     expiration.setDate(expiration.getDate() + expires);
                     objToSave.expires = expiration;
                 }
-                if (this.saveCookie || !window.localStorage) {
-                    this.saveCookie = false;
+                if (saveCookie || !storage) {
+                    saveCookie = false;
                     document.cookie = key + "=" + escape(JSON.stringify(value)) + ((expires) ? "; expires=" + expiration.toUTCString() : "") + "; path=" + path;
                 }
                 else {
                     objToSave.value = value;
-                    window.localStorage.setItem(key, JSON.stringify(objToSave));
+                    window.sessionStorage.setItem(key, JSON.stringify(objToSave));
                 }
                 return true;
             },
@@ -79,14 +86,18 @@
                 if (!key || typeof key !== "string") {
                     return false;
                 }
-                if (!this.saveCookie && window.localStorage) {
-                    window.localStorage.removeItem(key);
+                if (!saveCookie && storage) {
+                    window.sessionStorage.removeItem(key);
                 }
                 else {
-                    this.saveCookie = false;
+                    saveCookie = false;
                     document.cookie = key + "=; expires=-1; path=" + path;
                 }
                 return true;
+            },
+            update: function (key, value, expires) {
+                this.remove(key);
+                this.set(key, value, expires);
             }
         };
     }());
