@@ -60,9 +60,9 @@
                 }
                 return undefined;
             },
-            set: function (key, value, expires) {
-                var objToSave = {}, expiration = new Date(),
-                path = getPathForCookie();
+            set: function (key, value, path, expires) {
+                var objToSave = {}, expiration = new Date();
+                path = getPathForCookie(path);
                 if (!key || !value || typeof key !== "string") {
                     return false;
                 }
